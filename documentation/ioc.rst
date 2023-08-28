@@ -190,7 +190,7 @@ JSON Reference
 
 A Group `JSON schema <qsrv2-schema-0.json>`_ definition file is available.
 
-.. code-block:: json
+.. code-block::
 
     record(...) {
         info(Q:group, {
