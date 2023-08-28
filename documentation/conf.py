@@ -17,6 +17,7 @@
 # sys.path.insert(0, os.path.abspath('.'))
 
 import time
+import os
 
 def read_version(fmt):
     import os, re
@@ -52,6 +53,7 @@ release = read_version('{PVXS_MAJOR_VERSION}.{PVXS_MINOR_VERSION}.{PVXS_MAINTENA
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
     'sphinx.ext.githubpages',
     'breathe',
 ]
@@ -200,4 +202,9 @@ breathe_default_project = "PVXS"
 
 breathe_projects = {
     "PVXS": "xml"
+}
+
+intersphinx_mapping = {
+    'base': ('https://docs.epics-controls.org/en/latest',
+             ('epics-base.inv', None)),
 }
