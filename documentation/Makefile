@@ -1,5 +1,6 @@
 PYTHON?=python3
 CURL?=curl
+INKSCAPE?=inkscape
 
 # documentation generation requires Doxygen and Sphinx with the breathe extension
 #
@@ -9,7 +10,7 @@ all: gen
 
 clean:
 	rm -rf xml default pvxs.tag
-	rm -rf html _build
+	rm -rf html _build _image
 	rm -rf epics-base.inv
 
 fetch: epics-base.inv
@@ -20,10 +21,19 @@ gen: ../include/pvxs/version.h epics-base.inv
 	$(PYTHON) -m sphinx -j auto -b html . html
 	cp qsrv2-schema-0.json html/
 
+gen: _image/nt_table1.svg
+gen: _image/nt_table2.svg
+gen: _image/nt_table3.svg
+gen: _image/nt_table4.svg
+
 commit: gen
 	./commit-gh.sh documentation/html/ html/.nojekyll html/*.* html/_*/*.*
 
 epics-base.inv:
 	$(CURL) -o "$@" "https://docs.epics-controls.org/en/latest/objects.inv"
+
+_image/%.svg: %.svg
+	install -d _image
+	$(INKSCAPE) -l -o $@ $<
 
 .PHONY: all clean fetch gen commit
