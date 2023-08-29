@@ -9,14 +9,14 @@ IOC Integration
 The separate ``pvxsIoc`` library exists to run a PVXS server as part of an IOC.
 See also :ref:`includepvxs`.
 
-IOC Integration respects the **$PVXS_LOG** as well as **$EPICS_PVA\*** environment variables.
+IOC Integration respects the **$PVXS_LOG** as well as the **$EPICS_PVA\*** environment variables.
 Changes to this environment variable are possible prior to
-calling ``\*_registerRecordDeviceDriver(pdbbase)``.
+calling ``*_registerRecordDeviceDriver(pdbbase)``.
 
 IOC shell
 ^^^^^^^^^
 
-The "pvxsIoc" library adds several IOC shell functions which apply to all PVs
+The ``pvxsIoc`` library adds several IOC shell functions which apply to all PVs
 served by the Integrated PVA server.
 
 .. cpp:function:: void pvxsr(int level)
@@ -129,7 +129,8 @@ Group PV
 
 By default no Group PVs are defined.
 
-A Group PV is a mapping values taken from one or more Single PVs to be composed into an overall structure.
+A Group PV is a mapping of values taken from one or more database records
+and composed into an PVA structure.
 
 A Group is defined using a JSON syntax.
 Groups are defined with respect to a *Group Name*, which is also the PV name used when accessing the group.
@@ -149,20 +150,21 @@ For example of a group including two records is: ::
     record(ai, "rec:Y") {
         info(Q:group, {
             "grp:name": {
-                "Y": {+channel:"VAL"} // .VAL in enclosing record()
+                "Y": {+channel:"VAL"} # .VAL in enclosing record()
             }
         })
     }
 
-Or equivalently with separate .db file and .json files. ::
+Or equivalently with separate .db file and .json files.
+Use ``dbLoadGroup()`` to load .json files. ::
 
-    # some .db
+    # Store in some .db
     record(ai, "rec:X") {}
     record(ai, "rec:Y") {}
-    # in some .json
+    # Store in some .json
     {
         "grp:name": {
-            "X": {+channel:"rec:X.VAL"}, // full PV name
+            "X": {+channel:"rec:X.VAL"}, # full PV name
             "Y": {+channel:"rec:Y.VAL"}
         }
     }
@@ -189,22 +191,26 @@ JSON Reference
 ^^^^^^^^^^^^^^
 
 A Group `JSON schema <qsrv2-schema-0.json>`_ definition file is available.
+Keys beginning appear in contexts where a name may be either a data field name,
+or a special key.
 
 .. code-block::
 
     record(...) {
         info(Q:group, {
             "<group_name>":{
-                +id:"some/NT:1.0",  // top level ID
-                +atomic:true,       // whether monitors default to multi-locking atomicity
+                +id:"some/NT:1.0",  # top level ID
+                +atomic:true,
                 "<field.name>":{
-                    +type:"scalar", // controls how map VAL mapped onto <field.name>
+                    +type:"scalar",
                     +channel:"VAL",
-                    +id:"some/NT:1.0",
-                    +trigger:"*",   // "*" or comma seperated list of <field.name>s
-                    +putorder:0,    // set for fields where put is allowed, processing done in increasing order
+                    +id:"another/NT:1.0",
+                    +trigger:"*",
+                    +putorder:0,
                 },
-                "": {+type:"meta", +channel:"VAL"} // special case adds meta-data fields at top level
+                # special case adds time/alarm meta-data fields
+                # at top level
+                "": {+type:"meta", +channel:"VAL"}
             }
         })
     }
