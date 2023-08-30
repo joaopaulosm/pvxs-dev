@@ -119,21 +119,20 @@ When in a separate JSON file, ``+channel`` must be a full PV name, beginning wit
 
 Mapping ``+trigger``:
 
-The field triggers define how **changes to the constituent field are translated into a subscription update** to the group.
-``+trigger`` may be an empty string (``""``), a wildcard ``"*"``, or a comma separated list of group field names.
+Triggers define when and which **changes to the constituent field are translated into a subscription update** to the group.
+``+trigger`` may be set to:
 
 - ``""`` (default) means that changes to the field do not cause a subscription update.  (see note below)
 - ``"*"`` causes a subscription update containing the most recent values/meta-data of all group fields.
 - A comma separated list of field names causes an update with the most recent values of only the listed group fields.
   eg. ``+trigger: "value.A, value.B"``.
 
-As a general starting point when defining a new group.
-When that group is mapped to several records in a processing chain,
+For a new group definition, including records from one or more record processing chains,
 the last record in that chain should have a ``+trigger`` mapping listing the group fields
 updated by records in that chain.
 
 In the common case where a group is mapped to records in only one processing chain,
-then the last mapped record in that chain should ``+trigger: "*"``.
+then the last mapped record in that chain should have ``+trigger: "*"``.
 
 .. note:: As a special case.  A group with no ``+trigger`` mappings at all will function as if every mapping
           includes a ``+trigger`` mapping for itself.
