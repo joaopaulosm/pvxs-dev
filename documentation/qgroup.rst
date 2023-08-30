@@ -104,6 +104,8 @@ Field mapping ``+type``:
 - ``meta`` places only the "alarm" and "timeStamp" fields of ``scalar``.
 - ``structure`` places only the associated ``+id``.  Has no ``+channel``.
 - ``proc`` places no fields.  The associated ``+channel`` is processed on PUT.
+  "proc" mappings will almost always set ``+putorder`` to control the relative
+  ordering of record processing.
 
 
 ``+channel``:
@@ -130,35 +132,95 @@ NTTable Group Example
 ---------------------
 
 One motivating use case for groups involves moving tabular data, encoded as "NTTable".
-The following maps a table of two columns ("A" and "B") onto two aaoRecords.
-With a third record to take some action.
-Either when the group PV is written (atomic),
-or after non-atomic update of the individual records.
-(eg. interactively through a simple UI)
+The overall goal of the ``TST:Tbl`` group PV is to take what would be a series of
+discrete, non-atomic, network operations ::
+
+    caput -a TST:A X 1 2 3
+    caput -a TST:B X 5 6 7
+    caput TST:Save.PROC 1
+
+can instead be a single, atomic, network operation ::
+
+    pvput TST:Tbl value.A='[1,2,3]' value.B='[5,6,7]'
+
+A subscriber sees: ::
+
+    pvmonitor TST:Tbl
+    TST:Tbl <undefined>               INVALID DRIVER UDF
+    "Label A" "Label B"
+    TST:Tbl 2023-08-30 09:55:19.999
+    "Label A" "Label B"
+            1         5
+            2         6
+            3         7
+
+This effect is achieved by mapping a table of two columns ("A" and "B") onto two ``aao`` records.
+With a third record to take some action once both are updated.
 
 The following is meant to illustrate the mapping between the individual records,
-and the group PV ``TST:Tbl``.
+and the fields of the group PV ``TST:Tbl``.
 
 On the left hand side are the contents of a file ``test.db``,
 and on the right the output of ``pvget TST:Tbl``.
 
+.. raw:: html
+
+   <hr>
+
 .. image:: _image/nt_table1.svg
 
-Here the ``TST:Labels_`` record include two mappings for the ``TST:Tbl``.
-(each record may include mappings to more than one group)
+Here the ``TST:Labels_`` record contributes two mappings to the ``TST:Tbl`` Group.
+(a record might contribute mappings to more than one group)
 
-Arbitrarily, the ``+id`` mapping, setting the type label for the structure is placed here.
-This ``+id`` mapping could be placed on any of the
+This ``+id`` mapping contributes only the static type label string.
+it could be attached to any of the four records, and is arbitrarily placed with this one.
 
-Necessarily, the ``label`` mappings exists hold the column labels of the "NTTable" definition.
-So the record field ``TST:Labels_.VAL`` is mapped into ``TST:Tbl`` as ``labels``,
-appearing as a string array ("string[]").
+Necessarily, the ``label`` mappings provides the column labels of the "NTTable" definition.
+So the record ``TST:Labels_`` field ``VAL`` is mapped into ``TST:Tbl`` as ``labels``.
+With ``+type: "plain"``, this appears as a string array ("string[]").
+
+.. raw:: html
+
+   <hr>
 
 .. image:: _image/nt_table2.svg
 
+The ``TST:A`` record contributes only a ``value.A`` field.
+With ``+type: "plain"``, this appears as a string array ("double[]").
+
+The ``value.A`` mapping also sets ``+putorder: 0``, which is necessary to allow this group member
+field to be changed through a PUT to the Group PV.
+The numeric value controls the order in which records effected by a PUT are processed.
+Processing occurs in order of increasing ``+putorder``.
+
+.. raw:: html
+
+   <hr>
+
 .. image:: _image/nt_table3.svg
 
+The ``TST:B`` record contributes both a ``value.B`` field in the same manner as the A field/column.
+
+Additionally, it contributes a special ``""`` field with ``+type: "meta"``.
+This exposes the ``TST:B.VAL`` timestamp and alarm meta-data as the sub-structure
+fields ``alarm`` and ``timeStamp``.
+
+.. raw:: html
+
+   <hr>
+
 .. image:: _image/nt_table4.svg
+
+The final record ``TST:Save`` does not contribute any data fields.
+Instead it contributes a special ``+type: "proc"`` mapping.
+Also, it contributes a ``+trigger`` mapping so that processing this record will
+trigger a subscription/monitor update to all (changed) fields.
+
+Note, the field name ``_save`` only needs to be locally unique within the group,
+but is otherwise ignored.
+
+Database Listing
+^^^^^^^^^^^^^^^^
 
 Loading the following with. ::
 

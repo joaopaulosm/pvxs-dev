@@ -29,7 +29,7 @@
      showgrid="false"
      inkscape:zoom="1.1694737"
      inkscape:cx="127.40774"
-     inkscape:cy="267.21422"
+     inkscape:cy="266.78668"
      inkscape:window-width="1920"
      inkscape:window-height="1127"
      inkscape:window-x="0"
@@ -60,7 +60,9 @@
          style="fill:#000000;stroke-width:0.264583"
          x="2.8886437"
          y="5.2984304"
-         id="tspan1952">record(aai, &quot;TST:Labels_&quot;) {</tspan><tspan
+         id="tspan1952"><tspan
+   style="font-weight:bold"
+   id="tspan2573">record(aai, &quot;TST:Labels_&quot;)</tspan> {</tspan><tspan
          sodipodi:role="line"
          style="fill:#000000;stroke-width:0.264583"
          x="2.8886437"
@@ -110,7 +112,9 @@
          style="fill:#000000;stroke-width:0.264583"
          x="2.8886437"
          y="37.048431"
-         id="tspan3345">                            +channel:&quot;VAL&quot;}</tspan><tspan
+         id="tspan3345">                            +channel:&quot;<tspan
+   style="fill:#0000ff"
+   id="tspan2779">VAL</tspan>&quot;}</tspan><tspan
          sodipodi:role="line"
          style="fill:#000000;stroke-width:0.264583"
          x="2.8886437"
