@@ -243,3 +243,99 @@ Loading the following with. ::
 
 .. literalinclude:: ../test/table.db
     :linenos:
+
+Synchronization Example
+-----------------------
+
+Another use case is to synchronize the update of a structure that consists of fields with different update rates.
+In this scenario, if the ``+trigger`` points to a record with a slower update rate, a client monitoring
+the structure will receive updates at the same rate as the chosen record. ::
+
+    record(longin, "rec:10Hz") {
+        field(SCAN, ".1 second")
+        info(Q:group, {
+            "grp:name": {
+                "A": {+channel:"VAL", +type:"plain"}
+            }
+        })
+    }
+
+    record(longin, "rec:5Hz") {
+        field(SCAN, ".2 second")
+        info(Q:group, {
+            "grp:name": {
+                "B": {+channel:"VAL", +type:"plain"}
+            }
+        })
+    }
+
+    record(longin, "rec:1Hz") {
+        field(SCAN, "1 second")
+        info(Q:group, {
+            "grp:name": {
+                "C": {+channel:"VAL", +type:"plain", +trigger:"*"},
+                "": {+type:"meta", +channel:"VAL"}
+            }
+        })
+    }
+
+
+Note in the database above that the group definition in record ``rec:1Hz`` contains the ``+type: "meta"`` mapping.
+This will copy the alarm and timestamp of the original record to the resulting structure. Also note 
+all fields are marked with ``+type: "plain"``. This will cause the respective
+structure field to contain exclusively the value of the record field pointed by ``+channel`` (usually ``VAL``). 
+The default setting ``+type: "plain"`` would generates an entire NTScalar structure for the specific field.
+
+A ``pvget`` operation on the group PV would return the whole structure filled with the immediate value of each individual
+field of the group by the time the IOC receives the get request. A ``pvmonitor``, however, would return only when the
+field designated with ``+trigger: "*"`` gets processed by the IOC. In the example above, this happens at a 1 Hz pace: ::
+
+    pvmonitor grp:name
+
+    grp:name structure
+        structure record
+            structure _options
+                uint queueSize 0
+                boolean atomic true
+        alarm_t alarm
+            int severity 0
+            int status 0
+            string message NO_ALARM
+        structure timeStamp
+            long secondsPastEpoch 1693405255
+            int nanoseconds 92786000
+            int userTag 0
+        double A 10
+        double B 5
+        double C 1
+
+    (...)
+
+    grp:name structure
+        alarm_t alarm
+            int severity 0
+            int status 0
+            string message NO_ALARM
+        structure timeStamp
+            long secondsPastEpoch 1693405256
+            int nanoseconds 92239000
+            int userTag 0
+        double A 20
+        double B 10
+        double C 2
+
+    (...)
+
+    grp:name structure
+        alarm_t alarm
+            int severity 0
+            int status 0
+            string message NO_ALARM
+        structure timeStamp
+            long secondsPastEpoch 1693405257
+            int nanoseconds 94598000
+            int userTag 0
+        double A 30
+        double B 15
+        double C 3
+
