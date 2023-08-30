@@ -95,7 +95,7 @@ or a special key.
         })
     }
 
-Field mapping ``+type``:
+Mapping ``+type``:
 
 - ``scalar`` (default) places an NTScalar or NTScalarArray as a sub-structure.  (see :ref:`ntscalar`)
 - ``plain`` ignores all meta-data and places only the "value" as a field.
@@ -108,22 +108,38 @@ Field mapping ``+type``:
   ordering of record processing.
 
 
-``+channel``:
+Mapping ``+channel``:
 
+Most mapping ``+type`` require a ``+channel``.
+The most common record field to map is ``+channel: "VAL"``.
 When included in an ``info(Q:group, ...``, the ``+channel`` must only name a field of the enclosing record.
 (eg. ``+channel:"VAL"``)
 When in a separate JSON file, ``+channel`` must be a full PV name, beginning with a record or alias name.
 (eg. ``+channel:"record:name.VAL"``)
 
-Group ``+trigger``:
+Mapping ``+trigger``:
 
 The field triggers define how **changes to the constituent field are translated into a subscription update** to the group.
 ``+trigger`` may be an empty string (``""``), a wildcard ``"*"``, or a comma separated list of group field names.
 
-- ``""`` (the default) means that changes to the field do not cause a subscription update.
+- ``""`` (default) means that changes to the field do not cause a subscription update.  (see note below)
 - ``"*"`` causes a subscription update containing the most recent values/meta-data of all group fields.
 - A comma separated list of field names causes an update with the most recent values of only the listed group fields.
+  eg. ``+trigger: "value.A, value.B"``.
 
+As a general starting point when defining a new group.
+When that group is mapped to several records in a processing chain,
+the last record in that chain should have a ``+trigger`` mapping listing the group fields
+updated by records in that chain.
+
+In the common case where a group is mapped to records in only one processing chain,
+then the last mapped record in that chain should ``+trigger: "*"``.
+
+.. note:: As a special case.  A group with no ``+trigger`` mappings at all will function as if every mapping
+          includes a ``+trigger`` mapping for itself.
+          This is done so that such a situation does not cause confusion be posting no monitor updates at all.
+          However, this situation will almost never give desired behaviour as changes to records which
+          could otherwise be atomic will be split into multiple subscription updates.
 
 Understanding Groups
 ====================

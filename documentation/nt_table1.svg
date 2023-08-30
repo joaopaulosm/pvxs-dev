@@ -77,7 +77,7 @@
          style="fill:#000000;stroke-width:0.264583"
          x="2.8886437"
          y="17.204679"
-         id="tspan3335">    field(INP , {const:[&quot;<tspan
+         id="tspan3335">    field(INP , {const: [&quot;<tspan
    style="fill:#0000ff"
    id="tspan8641">Label A</tspan>&quot;, &quot;<tspan
    style="fill:#0000ff"
@@ -107,12 +107,12 @@
          y="33.079681"
          id="tspan3343">            &quot;<tspan
    style="fill:#0000ff"
-   id="tspan4764">labels</tspan>&quot;:{+type:&quot;plain&quot;,</tspan><tspan
+   id="tspan4764">labels</tspan>&quot;:{+type: &quot;plain&quot;,</tspan><tspan
          sodipodi:role="line"
          style="fill:#000000;stroke-width:0.264583"
          x="2.8886437"
          y="37.048431"
-         id="tspan3345">                            +channel:&quot;<tspan
+         id="tspan3345">                            +channel: &quot;<tspan
    style="fill:#0000ff"
    id="tspan2779">VAL</tspan>&quot;}</tspan><tspan
          sodipodi:role="line"
